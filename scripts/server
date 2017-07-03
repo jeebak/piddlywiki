@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+host=127.0.0.1
+
+# Using nc -z to find a free port, could use netstat or lsof -i
+for port in $(seq 8080 8099); do
+  nc -z "$host" "$port" && port='' || break
+done
+[[ -z "$port" ]] && echo No Free Ports && exit 1
+
+OPEN=$(command -v xdg-open) || OPEN=$(command -v open) && {
+  (sleep 1 && $OPEN http://$host:$port &);
+  php -S $host:$port;
+}
